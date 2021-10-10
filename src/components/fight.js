@@ -3,8 +3,9 @@ let finished = false;
 const player = {
 	hp: 10,
 	maxHp: 10,
-	attack: 5,
-	speed: 1.1
+	attack: 10,
+	speed: 0.2,
+	exp: 0
 };
 
 let enemy = {
@@ -29,6 +30,9 @@ const fight = () => {
 		update();
 
 		if (enemy.hp <= 0) {
+			player.exp += 1;
+			document.getElementById("player-info-exp").innerText = player.exp;
+			publish(FIGHT_EVENTS.FIGHT_WON);
 			return fightFinished();
 		}
 
@@ -89,16 +93,14 @@ const update = () => {
 const generateEnemy = () => {
 	return {
 		hp: 10,
-		attack: 10,
+		attack: 1,
 		speed: 2.0
 	}
 }
 
 const respawn = () => {
-	console.log('HALLO')
 	finished = false;
 	loop(document.getElementById("respawn-bar"), 0, 2000/100, () => {
-		console.log('OH MY')
 		finished = true;
 		player.hp = player.maxHp;
 
