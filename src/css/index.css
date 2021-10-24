@@ -5,7 +5,11 @@
 	padding: 5px;
 }
 
-
+.inventory-section {
+	position: absolute;
+	display: flex;
+	flex-direction: column;
+}
 
 .menu-button {
 	margin-bottom: 5px;
@@ -14,6 +18,10 @@
 .menu-button > button {
 	width: 100%;
 	padding: 5px;
+}
+
+.nav-link {
+	padding: .4rem .8rem;
 }
 
 .progress-bar {

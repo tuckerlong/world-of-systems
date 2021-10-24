@@ -7,7 +7,7 @@
 		<link rel="stylesheet" href="src/css/index.css">
 	</head>
 
-	<body>
+	<body oncontextmenu="return false;">
 		<div style="display: flex; margin: 0 5px">
 			<div style="width: 300px">
 				<h3 style="text-align: center;">Menu Section</h3>
@@ -25,7 +25,8 @@
 						</button>
 						<div>Hp: <span id="player-hp">10</span></div>
 						<div>Def: 1</div>
-						<div>Atk: 5</div>
+						<div>Atk/s: <span id="player-speed">1</span></div>
+						<div>Dmg/s: <span id="player-dps">1</span></div>
 
 						<div class="progress">
 							<div id="player-attack-bar" class="progress-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
@@ -36,7 +37,8 @@
 						<div style="text-align: center;">Enemy</div>
 						<div>Hp: <span id="enemy-hp">10</span></div>
 						<div>Def: 1</div>
-						<div>Atk: 2</div>
+						<div>Atk/s: <span id="enemy-speed">2</span></div>
+						<div>Dmg/s: <span id="enemy-dps">2</span></div>
 
 						<div class="progress">
 							<div id="enemy-attack-bar" class="progress-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
@@ -45,7 +47,10 @@
 				</div>
 				
 				<div style="display: flex; margin-top: 5px; flex-direction: column;">
-					<button id="fight-button" class="btn btn-outline-dark" style="width: 100px; margin: auto;" onclick="fight()">Fight!</button>
+					<div style="margin: auto">
+						<button id="fight-button" class="btn btn-outline-dark" style="width: 100px;" onclick="fight()">Fight!</button>
+						<button id="rest-button" class="btn btn-outline-success" style="width: 100px;" disabled onclick="rest()">Rest</button>
+					</div>
 					<button id="respawn-button" class="btn btn-outline-danger" style="width: 100px; margin: auto;" hidden onclick="respawn()">Respawn</button>
 
 					<div id="respawn" class="progress" style="margin: auto; margin-top: 5px; width: 100px;" hidden>
@@ -55,26 +60,148 @@
 
 				<!-- Storyline -->
 				<div style="display: flex; margin-top: 5px; flex-direction: column;">
+					<div style="text-align: center;">Map: <span id="storyline-map-name">Old Road</span></div>
 					<div style="text-align: center;">Left: <span id="storyline-kills-left">0</span>/10</div>
 					<div style="text-align: center;">Boss Killed: <i id="storyline-boss-killed-false" class="fa fa-sm fa-times" style="color: darkred;"></i><i id="storyline-boss-killed-true" class="fa fa-sm fa-check" style="color: darkgreen;" hidden></i></div>
 					<div style="margin: auto">
-						<button class="btn btn-outline-secondary" style="width: 100px" disabled>Previous</button>
-						<button class="btn btn-outline-secondary" style="width: 100px" disabled>Next</button>
+						<button id="storyline-previous" class="btn btn-outline-dark" style="width: 100px" onclick="storylinePrevious()" disabled>Previous</button>
+						<button id="storyline-next" class="btn btn-outline-dark" style="width: 100px" onclick="storylineNext()" disabled>Next</button>
+					</div>
+				</div>
+
+				<!--  -->
+			</div>
+		</div>
+
+		<!-- Inventory -->
+		<div style="position: absolute; bottom: 5px; left: 50%; transform: translateX(-50%); width: 300px">
+			<div class="accordion" id="inventory">
+				<div class="accordion-item">
+					<h2 class="accordion-header">
+						<button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#itemList" aria-expanded="false" aria-controls="itemList">
+							Inventory
+						</button>
+					</h2>
+					
+					<div id="itemList" class="accordion-collapse collapse show" aria-labelledby="headingOne" data-bs-parent="#inventory">
+						<div class="accordion-body">
+							<div style="height: 200px; position: relative;">
+								<div style="left: 0">
+									<div class="inventory-section" style="top: 60px;">
+										<div>Weapon:</div>
+										<img id="inventory-weapon" width="32px" height="32px" />
+									</div>
+
+									<div class="inventory-section" style="top: 120px;">
+										<div>Ring:</div>
+										<img width="32px" height="32px" />
+									</div>
+								</div>
+
+								<div style="position: absolute; left: 50%;">
+									<div class="inventory-section" style="top: 0; transform: translateX(-50%); align-items: center;">
+										<div>Helmet:</div>
+										<img width="32px" height="32px" />
+									</div>
+
+									<div class="inventory-section" style="top: 60px; transform: translateX(-50%); align-items: center">
+										<div>Armor:</div>
+										<img width="32px" height="32px" />
+									</div>
+								</div>
+
+								<div class="inventory-section" style="top: 0; right: 0; align-items: flex-end;">
+									<div>Amulet:</div>
+									<img width="32px" height="32px" />
+								</div>
+
+								
+								<div class="inventory-section" style="right: 0; top: 60px; align-items: flex-end;">
+									<div>Offhand:</div>
+									<img width="32px" height="32px" />
+								</div>
+							</div>
+						</div>
+
+						<div class="accordion-body" style="padding: 0">
+							<ul class="nav nav-tabs" id="myTab" role="tablist">
+								<li class="nav-item" role="presentation">
+									<button class="nav-link active" id="home-tab" onclick="inventoryChangeTab('weapons')" data-bs-toggle="tab" data-bs-target="#home" type="button" role="tab" aria-controls="home" aria-selected="true">
+										<img src="src/img/crossed-swords.svg" width="32px" >
+									</button>
+								</li>
+								<li class="nav-item" role="presentation">
+									<button class="nav-link" id="profile-tab" data-bs-toggle="tab" data-bs-target="#profile" type="button" role="tab" aria-controls="profile" aria-selected="false">
+										<img src="src/img/top-hat.svg" width="32px">
+									</button>
+								</li>
+								<li class="nav-item" role="presentation">
+									<button class="nav-link" id="contact-tab" onclick="inventoryChangeTab('armors')" data-bs-toggle="tab" data-bs-target="#contact" type="button" role="tab" aria-controls="contact" aria-selected="false">
+										<img src="src/img/kevlar.svg" width="32px">
+									</button>
+								</li>
+								<li class="nav-item" role="presentation">
+									<button class="nav-link" id="contact-tab" data-bs-toggle="tab" data-bs-target="#contact" type="button" role="tab" aria-controls="contact" aria-selected="false">
+										<img src="src/img/ring.svg" width="32px">
+									</button>
+								</li>
+								<li class="nav-item" role="presentation">
+									<button class="nav-link" id="contact-tab" data-bs-toggle="tab" data-bs-target="#contact" type="button" role="tab" aria-controls="contact" aria-selected="false">
+										<img src="src/img/leather-boot.svg" width="32px">
+									</button>
+								</li>
+							</ul>
+
+							<div class="tab-content" id="myTabContent">
+								<div class="tab-pane fade show active" style="display: flex; margin: 5px" role="tabpanel" aria-labelledby="home-tab">
+									<button class="btn btn-outline-secondary"><i class="fa fa-arrow-left"></i></button>
+									<div style="flex-grow: 1; display: flex; flex-direction: column; align-items: center;">
+										<div style="margin-bottom: 5px;">
+											<img id="inventory-0" width="32px" height="32px" />
+											<img id="inventory-1" width="32px" height="32px" />
+											<img id="inventory-2" width="32px" height="32px" />
+											<img id="inventory-3" width="32px" height="32px" />
+											<img id="inventory-4" width="32px" height="32px" />
+										</div>
+
+										<div>
+											<img id="inventory-5" width="32px" height="32px" />
+											<img id="inventory-6" width="32px" height="32px" />
+											<img id="inventory-7" width="32px" height="32px" />
+											<img id="inventory-8" width="32px" height="32px" />
+											<img id="inventory-9" width="32px" height="32px" />
+										</div>
+									</div>
+									<button class="btn btn-outline-secondary"><i class="fa fa-arrow-right"></i></button>
+								</div>
+							</div>
+						</div>
 					</div>
 				</div>
 			</div>
 		</div>
 
+		<div id="item-tooltip" style="position: fixed;" hidden>
+			<div class="card" style="width: 18rem;">
+				<div class="card-body">
+					<h5 id="item-tooltip-name" class="card-title" style="text-align: center;"></h5>
+					<p id="item-tooltip-weapon"></p>
+					<div style="position: absolute; bottom: 0px; left: 50%; color: grey; transform: translateX(-50%);	font-size: small;">Right click to equip</div>
+				</div>
+			</div>
+		</div>
+
+		<!-- Unlocks -->
 		<div style="position: absolute; bottom: 5px; right: 5px; width: 300px">
-			<div class="accordion" id="accordionExample">
+			<div class="accordion" id="unlocks">
 				<div class="accordion-item">
-					<h2 class="accordion-header" id="headingOne">
-						<button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="false" aria-controls="collapseOne">
+					<h2 class="accordion-header">
+						<button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#unlockList" aria-expanded="false" aria-controls="unlockList">
 							Next Unlocks
 						</button>
 					</h2>
 					
-					<div id="collapseOne" class="accordion-collapse collapse" aria-labelledby="headingOne" data-bs-parent="#accordionExample">
+					<div id="unlockList" class="accordion-collapse collapse" aria-labelledby="headingOne" data-bs-parent="#unlocks">
 						<div class="accordion-body">
 							<ul class="list-group">
 								<li class="list-group-item">Level 2: Passive Point</li>
@@ -109,6 +236,10 @@
 		</div>
 
 
+		<!-- Data files -->
+
+		<script src="src/data/items.js"></script>
+
 		<!-- Scripts -->
 
 		<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-kQtW33rZJAHjgefvhyyzcGF3C5TFyBQBA13V1RKPf4uH+bwyzQxZ6CmMZHmNBEfJ" crossorigin="anonymous"></script>
@@ -117,5 +248,6 @@
 		<script src="src/components/core.js"></script>
 		<script src="src/components/fight.js"></script>
 		<script src="src/components/storyline.js"></script>
+		<script src="src/components/items.js"></script>
 	</body>
 </html>

@@ -1,27 +1,49 @@
 const ACCESSOR = 'storyline';
+const MAPS = {
+	OLD_ROAD: 'Old Road',
+	TOWN_OF_TOWN: 'Town of Town'
+}
 const mapData = {
-	OLD_ROAD: {
-		name: 'Old Road'
+	[MAPS.OLD_ROAD]: {
+		next: MAPS.TOWN_OF_TOWN,
+		monsterLevel: 1
+	},
+	[MAPS.TOWN_OF_TOWN]: {
+		prev: MAPS.OLD_ROAD,
+		monsterLevel: 2
 	}
 }
 const map = 'Old road';
-let currentMap = mapData.OLD_ROAD.name;
+let currentMap = MAPS.OLD_ROAD;
 
 const updateStorylineDisplay = () => {
+	getElement('storyline-map-name').innerText = currentMap;
+
+	if (!!mapData[currentMap].prev) {
+		getElement('storyline-previous').removeAttribute('disabled');
+	} else {
+		getElement('storyline-previous').setAttribute('disabled', '');
+	}
+
 	if (data[ACCESSOR].completed.indexOf(currentMap) !== -1) {
 		getElement('storyline-kills-left').innerText = 10;
 		getElement('storyline-boss-killed-false').hidden = true;
 		getElement('storyline-boss-killed-true').hidden = false;
+		
+		if (!!mapData[currentMap].next) {
+			getElement('storyline-next').removeAttribute('disabled');
+		}
 	} else {
 		getElement('storyline-kills-left').innerText = data[ACCESSOR].progress[currentMap].killed;
 		getElement('storyline-boss-killed-false').hidden = false;
 		getElement('storyline-boss-killed-true').hidden = true;
+		getElement('storyline-next').setAttribute('disabled', '');
 	}
 }
 
 // Init
 (() => {
-	if (!(ACCESSOR in data)) data[ACCESSOR] = { completed: [], progress: {}, currentMap: mapData.OLD_ROAD.name };
+	if (!(ACCESSOR in data)) data[ACCESSOR] = { completed: [], progress: {}, currentMap: MAPS.OLD_ROAD };
 
 	currentMap = data[ACCESSOR].currentMap;
 
@@ -46,4 +68,33 @@ subscribe(FIGHT_EVENTS.FIGHT_WON, () => {
 	
 	updateStorylineDisplay();
 });
+
+const switchMap = (map) => {
+	if (!(map in data[ACCESSOR].progress)) {
+		data[ACCESSOR].progress[map] = { killed: 0, boss: false };
+	}
+
+	currentMap = map;
+	data[ACCESSOR].currentMap = map;
+	monsterLevel = mapData[map].monsterLevel;
+	
+	newEnemy();
+	updateStorylineDisplay();
+}
+
+const storylinePrevious = () => {
+	if (!!mapData[currentMap].prev) {
+		switchMap(mapData[currentMap].prev);
+	}
+}
+
+const storylineNext = () => {
+	if (data[ACCESSOR].completed.indexOf(currentMap) === -1) {
+		return;
+	}
+	
+	if (!!mapData[currentMap].next) {
+		switchMap(mapData[currentMap].next);
+	}
+}
 

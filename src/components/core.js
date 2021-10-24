@@ -43,3 +43,11 @@ const toast = (message) => {
 const getElement = (id) => {
 	return document.getElementById(id);
 }
+
+function generateRange(min, max) {
+	return Math.round(Math.random() * max) + min;
+}
+
+function random() {
+	return Math.random();
+}

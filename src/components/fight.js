@@ -3,35 +3,56 @@ let finished = false;
 const player = {
 	hp: 10,
 	maxHp: 10,
-	attack: 10,
+	attack: {
+		min: 1,
+		max: 1
+	},
 	speed: 0.2,
 	exp: 0
 };
 
 let enemy = {
 	hp: 10,
-	attack: 2,
+	attack: {
+		min: 1,
+		max: 2
+	},
 	speed: 2.0
 }
 
-const fight = () => {
-	document.getElementById("fight-button").setAttribute("disabled", "");
+let monsterLevel = 1;
+
+// init
+document.addEventListener('DOMContentLoaded', (e) => {
+	newEnemy();
+});
+
+function newEnemy() {
+	enemy = generateEnemy(monsterLevel);
+	update();
+}
+
+function calculateDamage(source, target) {
+	const val = Math.floor(Math.random() * source.attack.max +  source.attack.min);
+	return val;
+}
+
+function fight() {
+	getElement('fight-button').setAttribute('disabled', '');
+	getElement('rest-button').setAttribute('disabled', '')
 	
-	const bar = document.getElementById("player-attack-bar");
-	const ebar = document.getElementById("enemy-attack-bar");
+	const bar = document.getElementById('player-attack-bar');
+	const ebar = document.getElementById('enemy-attack-bar');
 
 	finished = false;
-
-	enemy = generateEnemy();
-
 	
 	const playerAttack = () => loop(bar, 0, (player.speed * 1000)/100, () => {
-		enemy.hp = Math.max(enemy.hp - player.attack, 0);
+		enemy.hp = Math.max(enemy.hp - calculateDamage(player, enemy), 0);
 		update();
 
 		if (enemy.hp <= 0) {
 			player.exp += 1;
-			document.getElementById("player-info-exp").innerText = player.exp;
+			document.getElementById('player-info-exp').innerText = player.exp;
 			publish(FIGHT_EVENTS.FIGHT_WON);
 			return fightFinished();
 		}
@@ -40,7 +61,7 @@ const fight = () => {
 	});
 
 	const enemyAttack = () => loop(ebar, 0, (enemy.speed * 1000)/100, () => {
-		player.hp = Math.max(player.hp - enemy.attack, 0);
+		player.hp = Math.max(player.hp - calculateDamage(enemy, player), 0);
 		update();
 
 		if (player.hp <= 0) {
@@ -56,13 +77,13 @@ const fight = () => {
 	enemyAttack();
 }
 
-const loop = (bar, progress, interval, onFinish) => {
+function loop(bar, progress, interval, onFinish) {
 	if (finished) {
 		return;
 	}
 
 	bar.style=`width: ${progress}%`;
-	bar.setAttribute("aria-valuenow", progress + "");
+	bar.setAttribute('aria-valuenow', progress + '');
 
 	if (progress + 1 > 100) {
 		return onFinish();
@@ -71,46 +92,88 @@ const loop = (bar, progress, interval, onFinish) => {
 	setTimeout(() => loop(bar, progress + 1, interval, onFinish), interval);
 }
 
-const fightFinished = () => {
+function fightFinished() {
 	finished = true;
 
+	if (player.hp < player.maxHp) {		
+		getElement('rest-button').removeAttribute('disabled');
+	}
+
 	if (player.hp <= 0) {
-		document.getElementById("fight-button").hidden = true;
-		document.getElementById("respawn-button").hidden = false;
-		document.getElementById("respawn").hidden = false;
+		getElement('fight-button').hidden = true;
+		getElement('rest-button').hidden = true;
+		getElement('respawn-button').hidden = false;
+		getElement('respawn').hidden = false;
 	} else {
-		document.getElementById("fight-button").removeAttribute("disabled");
+		getElement('fight-button').removeAttribute('disabled');
 	}
+
+	getElement('enemy-attack-bar').style=`width: 0`;
+	getElement('enemy-attack-bar').setAttribute('aria-valuenow', '0');
+	
+	getElement('player-attack-bar').style=`width: 0`;
+	getElement('player-attack-bar').setAttribute('aria-valuenow', '0');
+	
+	enemy = generateEnemy(monsterLevel);
+	update();
 }
 
-const update = () => {
-	document.getElementById("enemy-hp").innerText = enemy.hp;
+function update() {
+	getElement('enemy-hp').innerText = enemy.hp;
+	getElement('player-hp').innerText = player.hp;
 
+	getElement('player-dps').innerText = ((player.attack.max + player.attack.min)/2 / player.speed).toFixed(2);
+	getElement('enemy-dps').innerText = ((enemy.attack.max + enemy.attack.min)/2 / enemy.speed).toFixed(2);
 
-	document.getElementById("player-hp").innerText = player.hp;
+	getElement('player-speed').innerText = (1/player.speed).toFixed(2);
+	getElement('enemy-speed').innerText = (1/enemy.speed).toFixed(2);
 }
 
-const generateEnemy = () => {
+function generateEnemy(level) {
 	return {
-		hp: 10,
-		attack: 1,
-		speed: 2.0
+		hp: 10 + Math.round(Math.pow(level, 1.5)),
+		attack: {
+			min: Math.round(Math.pow(level, 1.3)),
+			max: Math.round(Math.pow(level, 1.3)) + Math.round(Math.pow(level, 1.5))
+		},
+		speed: 1.0
 	}
 }
 
-const respawn = () => {
+function respawn() {
 	finished = false;
-	loop(document.getElementById("respawn-bar"), 0, 2000/100, () => {
+	loop(document.getElementById('respawn-bar'), 0, 2000/100, () => {
 		finished = true;
 		player.hp = player.maxHp;
 
 		update();
 		
-		document.getElementById("respawn-bar").setAttribute("aria-valuenow", "0");
-		document.getElementById("respawn-bar").style = "width: 0%";
-		document.getElementById("fight-button").hidden = false;
-		document.getElementById("respawn-button").hidden = true;
-		document.getElementById("respawn").hidden = true;
-		document.getElementById("fight-button").removeAttribute("disabled");
-	})
+		getElement('respawn-bar').setAttribute('aria-valuenow', '0');
+		getElement('respawn-bar').style = 'width: 0%';
+		getElement('fight-button').hidden = false;
+		getElement('respawn-button').hidden = true;
+		getElement('respawn').hidden = true;
+		getElement('fight-button').removeAttribute('disabled');
+		getElement('rest-button').removeAttribute('disabled');
+	});
+}
+
+function rest() {
+	finished = false;
+
+	getElement('respawn').hidden = false;
+
+	loop(document.getElementById('respawn-bar'), 0, 2000/100, () => {
+		finished = true;
+		player.hp = player.maxHp;
+
+		update();
+
+		getElement('respawn').hidden = true;
+		getElement('respawn-bar').setAttribute('aria-valuenow', '0');
+		getElement('respawn-bar').style = 'width: 0%';
+		getElement('fight-button').hidden = false;
+		getElement('fight-button').removeAttribute('disabled');
+		getElement('rest-button').setAttribute('disabled', '');
+	});
 }
