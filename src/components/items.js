@@ -46,11 +46,9 @@ subscribe(FIGHT_EVENTS.FIGHT_WON, () => {
 });
 
 function inventoryChangeTab(t) {
-	console.log('TAB', t)
 	tab = t;
 	updateItemDisplay();
 }
-
 
 function updateItemDisplay() {
 	for (var i = 0; i < 10; i++) {
@@ -65,33 +63,55 @@ function updateItemDisplay() {
 		}
 
 		const idx = page * 10 + i;
+		let item = data[ITEM_ACCESSOR][tab][page * 10 + i];
+		item = {...item, ...ITEM_DATA[item.id]};
 
-		ele.src = 'src/img/crossed-swords.svg';
-		ele.onmouseover = (event) => itemTooltipDisplay(event, data[ITEM_ACCESSOR][tab][idx]);
+		ele.src = `src/img/${item.img}`;
+		ele.onmouseover = (event) => itemTooltipDisplay(event, data[ITEM_ACCESSOR][tab][idx], false);
 		ele.onmouseout = () => itemTooltipClose();
 		ele.oncontextmenu = () => itemEquip(idx);
 	}
 
-	const weapon = getElement('inventory-weapon');
-	if (!!data[ITEM_ACCESSOR].equipped.weapon) {
-		weapon.src = 'src/img/crossed-swords.svg';
-		weapon.onmouseover = (event) => itemTooltipDisplay(event, data[ITEM_ACCESSOR].equipped.weapon);
-		weapon.onmouseout = () => itemTooltipClose();
-		weapon.oncontextmenu = () => itemUnequip('weapon', 'weapons');
-	} else {
-		weapon.src = 'src/img/blank.png';
-		weapon.onmouseover = () => {};
-		weapon.onmouseout = () => {};
-		weapon.oncontextmenu = () => {};
-	}
+	const typeToList = {
+		[ITEM_TYPE.WEAPON]: 'weapons',
+		[ITEM_TYPE.ARMOR]: 'armors'
+	};
+
+	Object.values(ITEM_TYPE).forEach(type => {
+		const slot = getElement(`inventory-${type}`);
+		let item = data[ITEM_ACCESSOR].equipped[type];
+
+		if (!!item) {
+			item = {...item, ...ITEM_DATA[item.id]};
+
+			slot.src = `src/img/${item.img}`;
+			slot.onmouseover = (event) => itemTooltipDisplay(event, data[ITEM_ACCESSOR].equipped[type], true);
+			slot.onmouseout = () => itemTooltipClose();
+			slot.oncontextmenu = () => itemUnequip(type, typeToList[type]);
+		} else {
+			slot.src = 'src/img/blank.png';
+			slot.onmouseover = () => {};
+			slot.onmouseout = () => {};
+			slot.oncontextmenu = () => {};
+		}
+	});
 }
 
-function itemTooltipDisplay(event, itemData) {
+function itemTooltipDisplay(event, itemData, equipped) {
 	if (!itemData) {
 		return;
 	}
 
 	getElement('item-tooltip-weapon').hidden = true;
+	getElement('item-tooltip-armor').hidden = true;
+
+	if (equipped) {
+		getElement('item-tooltip-equip').hidden = true;
+		getElement('item-tooltip-unequip').hidden = false;
+	} else {
+		getElement('item-tooltip-equip').hidden = false;
+		getElement('item-tooltip-unequip').hidden = true;
+	}
 
 	// This will populate the item with static data
 	let item = { ...itemData, ...ITEM_DATA[itemData.id] };
@@ -103,12 +123,18 @@ function itemTooltipDisplay(event, itemData) {
 		getElement('item-tooltip-weapon').innerText = `Attack: ${item.min_attack} - ${item.max_attack}`;
 	}
 
+	if (item.type === ITEM_TYPE.ARMOR) {
+		getElement('item-tooltip-armor').hidden = false;
+		getElement('item-tooltip-armor').innerText = `Defense: ${item.def}`;
+	}
+
 	getElement('item-tooltip-name').innerText = item.name;
 
 	const r = event.target.getBoundingClientRect();
 	const ele = getElement('item-tooltip');
+
 	ele.style.top = `${r.top - 5}px`;
-	ele.style.left = `${r.left}px`;
+	ele.style.left = `${r.left + r.width/2}px`;
 	ele.style.transform = 'translateY(-100%) translateX(-50%)';
 	ele.hidden = false;
 }
@@ -118,8 +144,6 @@ function itemTooltipClose() {
 }
 
 function itemEquip(idx) {
-	console.log('eQuip', idx);
-
 	if (!data[ITEM_ACCESSOR][tab][idx]) {
 		return;
 	}
@@ -129,13 +153,10 @@ function itemEquip(idx) {
 	// This will populate the item with static data
 	item = { ...item, ...ITEM_DATA[item.id] };
 
-	if (item.type === ITEM_TYPE.WEAPON) {
-		const holder = data[ITEM_ACCESSOR].equipped.weapon;
-		data[ITEM_ACCESSOR].equipped.weapon = data[ITEM_ACCESSOR][tab][idx];
-		data[ITEM_ACCESSOR][tab][idx] = holder;
+	const holder = data[ITEM_ACCESSOR].equipped[item.type];
 
-		console.log(data);
-	}
+	data[ITEM_ACCESSOR].equipped[item.type] = data[ITEM_ACCESSOR][tab][idx];
+	data[ITEM_ACCESSOR][tab][idx] = holder;
 
 	updateStats();
 	updateItemDisplay();
@@ -184,6 +205,13 @@ function updateStats() {
 
 		player.attack.min = weapon.min_attack;
 		player.attack.max = weapon.max_attack;
+	}
+
+	if (!!data[ITEM_ACCESSOR].equipped.armor) {
+		let armor = data[ITEM_ACCESSOR].equipped.armor;
+		armor = {...armor, ...ITEM_DATA[armor.id]};
+
+		player.def = armor.def;
 	}
 
 	

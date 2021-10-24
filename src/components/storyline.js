@@ -42,13 +42,15 @@ const updateStorylineDisplay = () => {
 }
 
 // Init
-(() => {
+document.addEventListener('DOMContentLoaded', (e) => { 
 	if (!(ACCESSOR in data)) data[ACCESSOR] = { completed: [], progress: {}, currentMap: MAPS.OLD_ROAD };
 
 	currentMap = data[ACCESSOR].currentMap;
+	monsterLevel = mapData[currentMap].monsterLevel;
 
+	newEnemy();
 	updateStorylineDisplay();
-})();
+});
 
 subscribe(FIGHT_EVENTS.FIGHT_WON, () => {
 	if (data[ACCESSOR].completed.indexOf(currentMap) !== -1) {
@@ -77,7 +79,7 @@ const switchMap = (map) => {
 	currentMap = map;
 	data[ACCESSOR].currentMap = map;
 	monsterLevel = mapData[map].monsterLevel;
-	
+
 	newEnemy();
 	updateStorylineDisplay();
 }

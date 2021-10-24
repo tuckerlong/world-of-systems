@@ -11,6 +11,10 @@
 	flex-direction: column;
 }
 
+.inventory-section div {
+	text-decoration: underline;
+}
+
 .menu-button {
 	margin-bottom: 5px;
 }

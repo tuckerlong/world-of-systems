@@ -24,9 +24,10 @@
 							<i class="fa fa-sm fa-info"></i>
 						</button>
 						<div>Hp: <span id="player-hp">10</span></div>
-						<div>Def: 1</div>
+						<div>Def: <span id="player-def">0</span></div>
+						<div>Atk: <span id="player-atk">1 - 1</span></div>
 						<div>Atk/s: <span id="player-speed">1</span></div>
-						<div>Dmg/s: <span id="player-dps">1</span></div>
+						<div>Avg Dmg/s: <span id="player-dps">1</span></div>
 
 						<div class="progress">
 							<div id="player-attack-bar" class="progress-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
@@ -36,9 +37,10 @@
 					<div class="fighter-info">
 						<div style="text-align: center;">Enemy</div>
 						<div>Hp: <span id="enemy-hp">10</span></div>
-						<div>Def: 1</div>
+						<div>Def: <span id="enemy-def">0</span></div>
+						<div>Atk: <span id="enemy-atk">1 - 1</span></div>
 						<div>Atk/s: <span id="enemy-speed">2</span></div>
-						<div>Dmg/s: <span id="enemy-dps">2</span></div>
+						<div>Avg Dmg/s: <span id="enemy-dps">2</span></div>
 
 						<div class="progress">
 							<div id="enemy-attack-bar" class="progress-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
@@ -88,36 +90,41 @@
 							<div style="height: 200px; position: relative;">
 								<div style="left: 0">
 									<div class="inventory-section" style="top: 60px;">
-										<div>Weapon:</div>
+										<div>Weapon</div>
 										<img id="inventory-weapon" width="32px" height="32px" />
 									</div>
 
 									<div class="inventory-section" style="top: 120px;">
-										<div>Ring:</div>
+										<div>Ring</div>
 										<img width="32px" height="32px" />
 									</div>
 								</div>
 
 								<div style="position: absolute; left: 50%;">
 									<div class="inventory-section" style="top: 0; transform: translateX(-50%); align-items: center;">
-										<div>Helmet:</div>
+										<div>Helmet</div>
 										<img width="32px" height="32px" />
 									</div>
 
 									<div class="inventory-section" style="top: 60px; transform: translateX(-50%); align-items: center">
-										<div>Armor:</div>
-										<img width="32px" height="32px" />
+										<div>Armor</div>
+										<img id="inventory-armor" width="32px" height="32px" />
+									</div>
+
+									<div class="inventory-section" style="top: 120px; transform: translateX(-50%); align-items: center">
+										<div>Boots</div>
+										<img id="inventory-armor" width="32px" height="32px" />
 									</div>
 								</div>
 
 								<div class="inventory-section" style="top: 0; right: 0; align-items: flex-end;">
-									<div>Amulet:</div>
+									<div>Amulet</div>
 									<img width="32px" height="32px" />
 								</div>
 
 								
 								<div class="inventory-section" style="right: 0; top: 60px; align-items: flex-end;">
-									<div>Offhand:</div>
+									<div>Offhand</div>
 									<img width="32px" height="32px" />
 								</div>
 							</div>
@@ -186,7 +193,15 @@
 				<div class="card-body">
 					<h5 id="item-tooltip-name" class="card-title" style="text-align: center;"></h5>
 					<p id="item-tooltip-weapon"></p>
-					<div style="position: absolute; bottom: 0px; left: 50%; color: grey; transform: translateX(-50%);	font-size: small;">Right click to equip</div>
+					<p id="item-tooltip-armor"></p>
+
+					<div id="item-tooltip-equip" style="position: absolute; bottom: 0px; left: 50%; color: grey; transform: translateX(-50%);	font-size: small;">
+						Right click to equip
+					</div>
+
+					<div id="item-tooltip-unequip" style="position: absolute; bottom: 0px; left: 50%; color: grey; transform: translateX(-50%);	font-size: small;" hidden>
+						Right click to unequip
+					</div>
 				</div>
 			</div>
 		</div>

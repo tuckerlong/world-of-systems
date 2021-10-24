@@ -3,6 +3,7 @@ let finished = false;
 const player = {
 	hp: 10,
 	maxHp: 10,
+	def: 0,
 	attack: {
 		min: 1,
 		max: 1
@@ -13,6 +14,7 @@ const player = {
 
 let enemy = {
 	hp: 10,
+	def: 0,
 	attack: {
 		min: 1,
 		max: 2
@@ -33,7 +35,10 @@ function newEnemy() {
 }
 
 function calculateDamage(source, target) {
-	const val = Math.floor(Math.random() * source.attack.max +  source.attack.min);
+	let val = Math.floor(Math.random() * source.attack.max +  source.attack.min);
+	
+	val = Math.max(val - target.def, 0);
+
 	return val;
 }
 
@@ -41,8 +46,8 @@ function fight() {
 	getElement('fight-button').setAttribute('disabled', '');
 	getElement('rest-button').setAttribute('disabled', '')
 	
-	const bar = document.getElementById('player-attack-bar');
-	const ebar = document.getElementById('enemy-attack-bar');
+	const bar = getElement('player-attack-bar');
+	const ebar = getElement('enemy-attack-bar');
 
 	finished = false;
 	
@@ -52,7 +57,7 @@ function fight() {
 
 		if (enemy.hp <= 0) {
 			player.exp += 1;
-			document.getElementById('player-info-exp').innerText = player.exp;
+			getElement('player-info-exp').innerText = player.exp;
 			publish(FIGHT_EVENTS.FIGHT_WON);
 			return fightFinished();
 		}
@@ -127,11 +132,18 @@ function update() {
 
 	getElement('player-speed').innerText = (1/player.speed).toFixed(2);
 	getElement('enemy-speed').innerText = (1/enemy.speed).toFixed(2);
+
+	getElement('player-def').innerText = player.def;
+	getElement('enemy-def').innerText = enemy.def;
+
+	getElement('player-atk').innerText = `${player.attack.min} - ${player.attack.max}`;
+	getElement('enemy-atk').innerText = `${enemy.attack.min} - ${enemy.attack.max}`;
 }
 
 function generateEnemy(level) {
 	return {
 		hp: 10 + Math.round(Math.pow(level, 1.5)),
+		def: 0,
 		attack: {
 			min: Math.round(Math.pow(level, 1.3)),
 			max: Math.round(Math.pow(level, 1.3)) + Math.round(Math.pow(level, 1.5))
@@ -142,7 +154,7 @@ function generateEnemy(level) {
 
 function respawn() {
 	finished = false;
-	loop(document.getElementById('respawn-bar'), 0, 2000/100, () => {
+	loop(getElement('respawn-bar'), 0, 2000/100, () => {
 		finished = true;
 		player.hp = player.maxHp;
 
@@ -151,10 +163,11 @@ function respawn() {
 		getElement('respawn-bar').setAttribute('aria-valuenow', '0');
 		getElement('respawn-bar').style = 'width: 0%';
 		getElement('fight-button').hidden = false;
+		getElement('rest-button').hidden = false;
 		getElement('respawn-button').hidden = true;
 		getElement('respawn').hidden = true;
 		getElement('fight-button').removeAttribute('disabled');
-		getElement('rest-button').removeAttribute('disabled');
+		getElement('rest-button').setAttribute('disabled', '');
 	});
 }
 
@@ -163,7 +176,7 @@ function rest() {
 
 	getElement('respawn').hidden = false;
 
-	loop(document.getElementById('respawn-bar'), 0, 2000/100, () => {
+	loop(getElement('respawn-bar'), 0, 2000/100, () => {
 		finished = true;
 		player.hp = player.maxHp;
 
