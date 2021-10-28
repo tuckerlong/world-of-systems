@@ -11,7 +11,3 @@ const subscribe = (event, fn) => {
 
 	_registry[event].push(fn);
 }
-
-const FIGHT_EVENTS = {
-	FIGHT_WON: 'fightWon'
-}

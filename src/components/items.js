@@ -7,10 +7,12 @@ const ITEM_TABS = {
 }
 let page = 0;
 let tab = ITEM_TABS.WEAPONS;
+let isShiftPressed = false;
+let currentlyViewedItem = null;
 
 // init
 document.addEventListener('DOMContentLoaded', (e) => { 
-	// delete data[ITEM_ACCESSOR];
+	delete data[ITEM_ACCESSOR];
 	if (!(ITEM_ACCESSOR in data)) data[ITEM_ACCESSOR] = { 
 		weapons: [],
 		armors: [],
@@ -24,8 +26,10 @@ document.addEventListener('DOMContentLoaded', (e) => {
 	updateItemDisplay();
 });
 
+subscribe(EVENTS.SHIFT_PRESS, state => itemUpdateShift(state));
+
 subscribe(FIGHT_EVENTS.FIGHT_WON, () => {
-	return;
+	//return;
 
 	if (random() < 0.5) {
 		// return;
@@ -97,13 +101,21 @@ function updateItemDisplay() {
 	});
 }
 
-function itemTooltipDisplay(event, itemData, equipped) {
-	if (!itemData) {
+
+function itemUpdateShift(state) {
+	isShiftPressed = state;
+	console.log('Test');
+	if (currentlyViewedItem) {
+		itemTooltipUpdate(currentlyViewedItem);
+	}
+}
+
+function itemTooltipDisplay(event, item, equipped) {
+	if (!item) {
 		return;
 	}
 
-	getElement('item-tooltip-weapon').hidden = true;
-	getElement('item-tooltip-armor').hidden = true;
+	currentlyViewedItem = item;
 
 	if (equipped) {
 		getElement('item-tooltip-equip').hidden = true;
@@ -113,22 +125,7 @@ function itemTooltipDisplay(event, itemData, equipped) {
 		getElement('item-tooltip-unequip').hidden = true;
 	}
 
-	// This will populate the item with static data
-	let item = { ...itemData, ...ITEM_DATA[itemData.id] };
-
-	console.log('Item', item)
-
-	if (item.type === ITEM_TYPE.WEAPON) {
-		getElement('item-tooltip-weapon').hidden = false;
-		getElement('item-tooltip-weapon').innerText = `Attack: ${item.min_attack} - ${item.max_attack}`;
-	}
-
-	if (item.type === ITEM_TYPE.ARMOR) {
-		getElement('item-tooltip-armor').hidden = false;
-		getElement('item-tooltip-armor').innerText = `Defense: ${item.def}`;
-	}
-
-	getElement('item-tooltip-name').innerText = item.name;
+	itemTooltipUpdate(item);
 
 	const r = event.target.getBoundingClientRect();
 	const ele = getElement('item-tooltip');
@@ -139,7 +136,46 @@ function itemTooltipDisplay(event, itemData, equipped) {
 	ele.hidden = false;
 }
 
+function itemTooltipUpdate(item) {
+	getElement('item-tooltip-weapon').hidden = true;
+	getElement('item-tooltip-armor').hidden = true;
+
+	// This will populate the item with static data
+	let itemData = ITEM_DATA[item.id];
+
+	console.log('Item', itemData, item)
+
+	if (itemData.type === ITEM_TYPE.WEAPON) {
+		getElement('item-tooltip-weapon').hidden = false;
+		getElement('item-tooltip-weapon').innerText = `Attack: ${itemData.min_attack} - ${itemData.max_attack}`;
+	}
+
+	if (itemData.type === ITEM_TYPE.ARMOR) {
+		getElement('item-tooltip-armor').hidden = false;
+		getElement('item-tooltip-armor').innerText = `Defense: ${itemData.def}`;
+	}
+
+	getElement('item-tooltip-name').innerText = itemData.name;
+
+	getElement('item-tooltip-affixes').innerText = '';
+	item.affixes.forEach(affix => {
+		let line = AFFIX_DATA[affix[0]].text;
+
+		affix[2].forEach((mod, idx) => {
+			if (isShiftPressed) {
+				line = line.replace('#', `${mod}(${AFFIX_DATA[affix[0]].ranges[affix[1]][2][idx][0]} - ${AFFIX_DATA[affix[0]].ranges[affix[1]][2][idx][1]})`)
+			} else {
+				line = line.replace('#', mod);
+			}
+		});
+
+		getElement('item-tooltip-affixes').innerHTML += `${line}<br/>` ;
+	});
+}
+
 function itemTooltipClose() {
+	currentlyViewedItem = null;
+
 	getElement('item-tooltip').hidden = true;
 }
 
@@ -179,23 +215,48 @@ function itemUnequip(slot, to) {
 }
 
 function generateItem() {
-	return generateArmor();
+	const item = generateArmor();
+
+	addAffix(item);
+	addAffix(item);
+
+	console.log('ITEM', item)
+
+	return item;
 }
 
 function generateArmor() {
 	return {
 		id: ITEM_MAP.CLOTH_ARMOR,
-		prefix: [],
-		suffix: []
+		affixes: []
 	}
 }
 
 function generateWeapon() {
 	return {
 		id: ITEM_MAP.WOOD_SWORD,
-		prefix: [],
-		suffix: []
+		affixes: []
 	}
+}
+
+function addAffix(item) {
+	const available = [];
+
+	ITEM_DATA[item.id].affixes.forEach(affix => AFFIX_DATA[affix].ranges.forEach(range => {
+		console.log(player.level, range[0])
+		if (player.level >= range[0]) {
+			available.push([affix, ...range]);
+		}
+	}));
+
+	console.log(available);
+
+	const range_idx = range(0, available.length - 1);
+	const affix = available[range_idx];
+
+	item.affixes.push([affix[0], range_idx, affix[3].map(min_max => range(min_max[0], min_max[1]))]);
+
+	return item;
 }
 
 function updateStats() {

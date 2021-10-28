@@ -1,5 +1,9 @@
 let finished = false;
 
+const FIGHT_EVENTS = {
+	FIGHT_WON: 'fightWon'
+}
+
 const player = {
 	hp: 10,
 	maxHp: 10,
@@ -9,6 +13,7 @@ const player = {
 		max: 1
 	},
 	speed: 0.2,
+	level: 1,
 	exp: 0
 };
 

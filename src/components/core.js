@@ -45,9 +45,31 @@ const getElement = (id) => {
 }
 
 function generateRange(min, max) {
-	return Math.round(Math.random() * max) + min;
+	return Math.round(Math.random() * (max - min)) + min;
+}
+
+function range(min, max) {
+	return generateRange(min, max);
 }
 
 function random() {
 	return Math.random();
 }
+
+
+const EVENTS = {
+	SHIFT_PRESS: 'shift_pressed'
+}
+let coreIsShiftPressed = false;
+
+function shiftPressed(e) {
+	if (e.key !== 'Shift' || e.shiftKey === coreIsShiftPressed) {
+		return;
+	}
+
+	coreIsShiftPressed = e.shiftKey;
+	publish(EVENTS.SHIFT_PRESS, coreIsShiftPressed);
+}
+
+document.addEventListener('keydown', shiftPressed);
+document.addEventListener('keyup', shiftPressed);
