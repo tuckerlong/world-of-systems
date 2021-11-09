@@ -9,7 +9,7 @@ const save = () => {
 }
 
 const load = () => {
-	data = JSON.parse(localStorage.getItem("data"));
+	data = JSON.parse(localStorage.getItem("data")) || {};
 }
 
 load();
@@ -48,12 +48,20 @@ function generateRange(min, max) {
 	return Math.round(Math.random() * (max - min)) + min;
 }
 
+function choose(array) {
+	return array[generateRange(0, array.length - 1)];
+}
+
 function range(min, max) {
 	return generateRange(min, max);
 }
 
 function random() {
 	return Math.random();
+}
+
+function wait(time, fn) {
+	setTimeout(() => fn(), time);
 }
 
 
@@ -73,3 +81,11 @@ function shiftPressed(e) {
 
 document.addEventListener('keydown', shiftPressed);
 document.addEventListener('keyup', shiftPressed);
+
+
+
+
+function roll() {
+	const images = ['Boss Abomination Red.png', 'Forest Tree.png', 'Goblin Grunt.png', 'Boss Darkness Titan Ilnoct.png']
+	getElement('monster-image').src = `src/img/monsters/${images[range(0, images.length - 1)]}`;
+}

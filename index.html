@@ -5,63 +5,74 @@
 		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 
 		<link rel="stylesheet" href="src/css/index.css">
+		<link rel="import" href="gems.html">
 	</head>
 
-	<body oncontextmenu="return false;">
-		<div style="display: flex; margin: 0 5px">
-			<div style="width: 300px">
-				<h3 style="text-align: center;">Menu Section</h3>
+	<body oncontextmenu="return false;" style="background-color: #433A3F; color: #D7D9CE;">
+		<div style="display: flex; margin: 5px">
+			<div id="menu" class="collapsed" hidden>
+				<button class="btn btn-outline-secondary" onclick="collapseMenu()" style="position: absolute; left: 305px;"><i class="fa fa-arrow-right"></i></button>
 				<div class="menu-button"><button class="btn btn-primary">Storyline</button></div>
 				<div class="menu-button"><button class="btn btn-secondary">Maps</button></div>
 			</div>
 
-			<div style="flex: 1">
-				<h3 style="text-align: center;">Content Section</h3>
-				<div style="display: flex; justify-content: center;">
-					<div class="fighter-info" >
-						<div style="text-align: center;">You</div>
-						<button id="player-info" class="btn btn-outline-info btn-sm" style="position: absolute; top: 5px; right: 5px; padding: 0 .25rem;" data-bs-toggle="modal" data-bs-target="#exampleModal">
-							<i class="fa fa-sm fa-info"></i>
-						</button>
-						<div>Hp: <span id="player-hp">10</span></div>
-						<div>Def: <span id="player-def">0</span></div>
-						<div>Atk: <span id="player-atk">1 - 1</span></div>
-						<div>Atk/s: <span id="player-speed">1</span></div>
-						<div>Avg Dmg/s: <span id="player-dps">1</span></div>
+			<div id="section-content">
+				<div id="logs" class="absolute-center" style="display: flex; flex-direction: column-reverse;"></div>
 
-						<div class="progress">
-							<div id="player-attack-bar" class="progress-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+				<div id="section-combat" hidden>
+					<div class="absolute-center" style="bottom: 5px; z-index: 1;">
+						<div style="margin: auto">
+							<button id="fight-button" class="btn btn-outline-danger" style="width: 100px;" onclick="fight()">Fight!</button>
+							<button id="rest-button" class="btn btn-outline-success" style="width: 100px;" disabled onclick="rest()" hidden>Rest</button>
+						</div>
+						<button id="respawn-button" class="btn btn-outline-danger" style="width: 100px; margin: auto;" hidden onclick="respawn()">Respawn</button>
+
+						<div id="respawn" class="progress" style="margin: auto; margin-top: 5px; width: 100px;" hidden>
+							<div id="respawn-bar" class="progress-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
 						</div>
 					</div>
-					<h2 style="text-align: center; align-self: center; margin: 0 10px;">VS</h2>
-					<div class="fighter-info">
-						<div style="text-align: center;">Enemy</div>
-						<div>Hp: <span id="enemy-hp">10</span></div>
-						<div>Def: <span id="enemy-def">0</span></div>
-						<div>Atk: <span id="enemy-atk">1 - 1</span></div>
-						<div>Atk/s: <span id="enemy-speed">2</span></div>
-						<div>Avg Dmg/s: <span id="enemy-dps">2</span></div>
 
-						<div class="progress">
-							<div id="enemy-attack-bar" class="progress-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+					<div style="display: flex; justify-content: center; min-height: fit-content; z-index: 10">
+						<div class="fighter-info" style="position: absolute; left: calc(50% - 300px); bottom: 60px; transform: translateX(-50%);">
+							<!-- <div style="text-align: center;">You</div>
+							<button id="player-info" class="btn btn-outline-info btn-sm" style="position: absolute; top: 5px; right: 5px; padding: 0 .25rem;" data-bs-toggle="modal" data-bs-target="#exampleModal">
+								<i class="fa fa-sm fa-info"></i>
+							</button>
+							<div>Hp: <span id="player-hp">10</span></div>
+							<div>Def: <span id="player-def">0</span></div>
+							<div>Atk: <span id="player-atk">1 - 1</span></div>
+							<div>Atk/s: <span id="player-speed">1</span></div>
+							<div>Avg Dmg/s: <span id="player-dps">1</span></div> -->
+
+							<!-- <div class="progress">
+								<div id="player-attack-bar" class="progress-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+							</div> -->
+
+							<img id="player-image" src="src/img/monsters/Legendary Knights Nobleman Ansellus.png" />
 						</div>
-					</div>
-				</div>
-				
-				<div style="display: flex; margin-top: 5px; flex-direction: column;">
-					<div style="margin: auto">
-						<button id="fight-button" class="btn btn-outline-dark" style="width: 100px;" onclick="fight()">Fight!</button>
-						<button id="rest-button" class="btn btn-outline-success" style="width: 100px;" disabled onclick="rest()">Rest</button>
-					</div>
-					<button id="respawn-button" class="btn btn-outline-danger" style="width: 100px; margin: auto;" hidden onclick="respawn()">Respawn</button>
 
-					<div id="respawn" class="progress" style="margin: auto; margin-top: 5px; width: 100px;" hidden>
-						<div id="respawn-bar" class="progress-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
-					</div>
+						<!-- <h2 style="text-align: center; align-self: center; margin: 0 10px;">VS</h2> -->
+
+						<div class="fighter-info" style="position: absolute; right: calc(50% - 300px); bottom: 60px; transform: translateX(50%)">
+							<!-- <div style="text-align: center;">Enemy</div>
+							<div>Hp: <span id="enemy-hp">10</span></div>
+							<div>Def: <span id="enemy-def">0</span></div>
+							<div>Atk: <span id="enemy-atk">1 - 1</span></div>
+							<div>Atk/s: <span id="enemy-speed">2</span></div>
+							<div>Avg Dmg/s: <span id="enemy-dps">2</span></div>
+
+							<div class="progress">
+								<div id="enemy-attack-bar" class="progress-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+							</div> -->
+							<a data-bs-toggle="modal" data-bs-target="#imageModal" style="cursor: pointer;" title="Click for full view" >
+								<img id="monster-image" src="src/img/monsters/Undead Walker.png" style="transform: scaleX(-1);"/>
+							</a>
+						</div>
+					</div>					
 				</div>
 
 				<!-- Storyline -->
-				<div style="display: flex; margin-top: 5px; flex-direction: column;">
+				<div style="display: flex; margin-top: 5px; flex-direction: column;" hidden>
 					<div style="text-align: center;">Map: <span id="storyline-map-name">Old Road</span></div>
 					<div style="text-align: center;">Left: <span id="storyline-kills-left">0</span>/10</div>
 					<div style="text-align: center;">Boss Killed: <i id="storyline-boss-killed-false" class="fa fa-sm fa-times" style="color: darkred;"></i><i id="storyline-boss-killed-true" class="fa fa-sm fa-check" style="color: darkgreen;" hidden></i></div>
@@ -74,118 +85,158 @@
 
 				<!--  -->
 			</div>
+
+			<!-- <div id="section-logs">
+				<h3 style="text-align: center;"><button class="btn btn-outline-secondary" onclick="collapseLogs()"><i class="fa fa-arrow-right"></i></button></h3>
+				<textarea id="log" style="width: 100%"></textarea>
+			</div> -->
+
+			<div id="menu-right" class="d-flex align-items-start collapsed" >
+				<div class="nav flex-column nav-pills me-3" id="v-pills-tab" role="tablist" aria-orientation="vertical" >
+					<button class="btn btn-outline-secondary" onclick="collapseMenuRight()" style="margin-bottom: 5px;"><i class="fa fa-arrow-right"></i></button>
+					<button class="nav-link active" id="menu-right-inventory" onclick="openMenuRight()" data-bs-toggle="pill" data-bs-target="#v-pills-home" type="button" role="tab" aria-controls="v-pills-home" aria-selected="true">Inventory</button>
+					<button class="nav-link" id="v-pills-profile-tab" onclick="openMenuRight()" data-bs-toggle="pill" data-bs-target="#v-pills-profile" type="button" role="tab" aria-controls="v-pills-profile" aria-selected="false">Profile</button>
+					<button class="nav-link" id="v-pills-messages-tab" onclick="openMenuRight()" data-bs-toggle="pill" data-bs-target="#v-pills-messages" type="button" role="tab" aria-controls="v-pills-messages" aria-selected="false">Messages</button>
+					<button class="nav-link" id="v-pills-settings-tab" onclick="openMenuRight()" data-bs-toggle="pill" data-bs-target="#v-pills-settings" type="button" role="tab" aria-controls="v-pills-settings" aria-selected="false">Settings</button>
+				</div>
+
+				<div class="tab-content" id="v-pills-tabContent" >
+					<!-- Inventory -->
+					<div class="tab-pane fade show active" id="v-pills-home" role="tabpanel" aria-labelledby="v-pills-home-tab">							
+						<div id="itemList">
+							<div class="">
+								<div style="height: 200px; position: relative;">
+									<div style="left: 0">
+										<div class="inventory-section" style="top: 60px;">
+											<div>Weapon</div>
+											<img id="inventory-weapon" width="32px" height="32px" />
+										</div>
+	
+										<div class="inventory-section" style="top: 120px;">
+											<div>Ring</div>
+											<img width="32px" height="32px" />
+										</div>
+									</div>
+	
+									<div style="position: absolute; left: 50%;">
+										<div class="inventory-section" style="top: 0; transform: translateX(-50%); align-items: center;">
+											<div>Helmet</div>
+											<img width="32px" height="32px" />
+										</div>
+	
+										<div class="inventory-section" style="top: 60px; transform: translateX(-50%); align-items: center">
+											<div>Armor</div>
+											<img id="inventory-armor" width="32px" height="32px" />
+										</div>
+	
+										<div class="inventory-section" style="top: 120px; transform: translateX(-50%); align-items: center">
+											<div>Boots</div>
+											<img id="inventory-armor" width="32px" height="32px" />
+										</div>
+									</div>
+	
+									<div class="inventory-section" style="top: 0; right: 0; align-items: flex-end;">
+										<div>Amulet</div>
+										<img width="32px" height="32px" />
+									</div>
+	
+									
+									<div class="inventory-section" style="right: 0; top: 60px; align-items: flex-end;">
+										<div>Offhand</div>
+										<img width="32px" height="32px" />
+									</div>
+								</div>
+							</div>
+	
+							<div class="accordion-body" style="padding: 0">
+								<ul class="nav nav-tabs" id="myTab" role="tablist">
+									<li class="nav-item" role="presentation">
+										<button class="nav-link active" id="home-tab" onclick="inventoryChangeTab('weapons')" data-bs-toggle="tab" data-bs-target="#home" type="button" role="tab" aria-controls="home" aria-selected="true">
+											<img src="src/img/crossed-swords.svg" width="32px" >
+										</button>
+									</li>
+									<li class="nav-item" role="presentation">
+										<button class="nav-link" id="profile-tab" data-bs-toggle="tab" data-bs-target="#profile" type="button" role="tab" aria-controls="profile" aria-selected="false">
+											<img src="src/img/top-hat.svg" width="32px">
+										</button>
+									</li>
+									<li class="nav-item" role="presentation">
+										<button class="nav-link" id="contact-tab" onclick="inventoryChangeTab('armors')" data-bs-toggle="tab" data-bs-target="#contact" type="button" role="tab" aria-controls="contact" aria-selected="false">
+											<img src="src/img/kevlar.svg" width="32px">
+										</button>
+									</li>
+									<li class="nav-item" role="presentation">
+										<button class="nav-link" id="contact-tab" data-bs-toggle="tab" data-bs-target="#contact" type="button" role="tab" aria-controls="contact" aria-selected="false">
+											<img src="src/img/ring.svg" width="32px">
+										</button>
+									</li>
+									<li class="nav-item" role="presentation">
+										<button class="nav-link" id="contact-tab" data-bs-toggle="tab" data-bs-target="#contact" type="button" role="tab" aria-controls="contact" aria-selected="false">
+											<img src="src/img/leather-boot.svg" width="32px">
+										</button>
+									</li>
+								</ul>
+	
+								<div class="tab-content" id="myTabContent">
+									<div class="tab-pane fade show active" style="display: flex; margin: 5px" role="tabpanel" aria-labelledby="home-tab">
+										<button class="btn btn-outline-secondary"><i class="fa fa-arrow-left"></i></button>
+										<div style="flex-grow: 1; display: flex; flex-direction: column; align-items: center;">
+											<div style="margin-bottom: 5px;">
+												<img id="inventory-0" width="32px" height="32px" />
+												<img id="inventory-1" width="32px" height="32px" />
+												<img id="inventory-2" width="32px" height="32px" />
+												<img id="inventory-3" width="32px" height="32px" />
+												<img id="inventory-4" width="32px" height="32px" />
+											</div>
+	
+											<div>
+												<img id="inventory-5" width="32px" height="32px" />
+												<img id="inventory-6" width="32px" height="32px" />
+												<img id="inventory-7" width="32px" height="32px" />
+												<img id="inventory-8" width="32px" height="32px" />
+												<img id="inventory-9" width="32px" height="32px" />
+											</div>
+										</div>
+										<button class="btn btn-outline-secondary"><i class="fa fa-arrow-right"></i></button>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+					<!-- Inventory End -->
+
+					<div class="tab-pane fade" id="v-pills-profile" role="tabpanel" aria-labelledby="v-pills-profile-tab">
+						<!-- Gems -->
+						<div style="width: 200px">
+							<div style="margin-bottom: 5px">
+								<img id="gem-0" width="32px" height="32px" />
+								<img id="gem-1" width="32px" height="32px" />
+								<img id="gem-2" width="32px" height="32px" />
+								<img id="gem-3" width="32px" height="32px" />
+								<img id="gem-4" width="32px" height="32px" />
+							</div>
+							<div>
+								<img id="gem-5" width="32px" height="32px" />
+								<img id="gem-6" width="32px" height="32px" />
+								<img id="gem-7" width="32px" height="32px" />
+								<img id="gem-8" width="32px" height="32px" />
+								<img id="gem-9" width="32px" height="32px" />
+							</div>
+						</div>
+						<!-- Gems End -->
+					</div>
+					<div class="tab-pane fade" id="v-pills-messages" role="tabpanel" aria-labelledby="v-pills-messages-tab">
+						<div id="gems"></div>
+					</div>
+					<div class="tab-pane fade" id="v-pills-settings" role="tabpanel" aria-labelledby="v-pills-settings-tab">...</div>
+				</div>
+			</div>
 		</div>
 
 		<!-- Inventory -->
 		<div style="position: absolute; bottom: 5px; left: 50%; transform: translateX(-50%); width: 300px">
 			<div class="accordion" id="inventory">
-				<div class="accordion-item">
-					<h2 class="accordion-header">
-						<button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#itemList" aria-expanded="false" aria-controls="itemList">
-							Inventory
-						</button>
-					</h2>
-					
-					<div id="itemList" class="accordion-collapse collapse show" aria-labelledby="headingOne" data-bs-parent="#inventory">
-						<div class="accordion-body">
-							<div style="height: 200px; position: relative;">
-								<div style="left: 0">
-									<div class="inventory-section" style="top: 60px;">
-										<div>Weapon</div>
-										<img id="inventory-weapon" width="32px" height="32px" />
-									</div>
-
-									<div class="inventory-section" style="top: 120px;">
-										<div>Ring</div>
-										<img width="32px" height="32px" />
-									</div>
-								</div>
-
-								<div style="position: absolute; left: 50%;">
-									<div class="inventory-section" style="top: 0; transform: translateX(-50%); align-items: center;">
-										<div>Helmet</div>
-										<img width="32px" height="32px" />
-									</div>
-
-									<div class="inventory-section" style="top: 60px; transform: translateX(-50%); align-items: center">
-										<div>Armor</div>
-										<img id="inventory-armor" width="32px" height="32px" />
-									</div>
-
-									<div class="inventory-section" style="top: 120px; transform: translateX(-50%); align-items: center">
-										<div>Boots</div>
-										<img id="inventory-armor" width="32px" height="32px" />
-									</div>
-								</div>
-
-								<div class="inventory-section" style="top: 0; right: 0; align-items: flex-end;">
-									<div>Amulet</div>
-									<img width="32px" height="32px" />
-								</div>
-
-								
-								<div class="inventory-section" style="right: 0; top: 60px; align-items: flex-end;">
-									<div>Offhand</div>
-									<img width="32px" height="32px" />
-								</div>
-							</div>
-						</div>
-
-						<div class="accordion-body" style="padding: 0">
-							<ul class="nav nav-tabs" id="myTab" role="tablist">
-								<li class="nav-item" role="presentation">
-									<button class="nav-link active" id="home-tab" onclick="inventoryChangeTab('weapons')" data-bs-toggle="tab" data-bs-target="#home" type="button" role="tab" aria-controls="home" aria-selected="true">
-										<img src="src/img/crossed-swords.svg" width="32px" >
-									</button>
-								</li>
-								<li class="nav-item" role="presentation">
-									<button class="nav-link" id="profile-tab" data-bs-toggle="tab" data-bs-target="#profile" type="button" role="tab" aria-controls="profile" aria-selected="false">
-										<img src="src/img/top-hat.svg" width="32px">
-									</button>
-								</li>
-								<li class="nav-item" role="presentation">
-									<button class="nav-link" id="contact-tab" onclick="inventoryChangeTab('armors')" data-bs-toggle="tab" data-bs-target="#contact" type="button" role="tab" aria-controls="contact" aria-selected="false">
-										<img src="src/img/kevlar.svg" width="32px">
-									</button>
-								</li>
-								<li class="nav-item" role="presentation">
-									<button class="nav-link" id="contact-tab" data-bs-toggle="tab" data-bs-target="#contact" type="button" role="tab" aria-controls="contact" aria-selected="false">
-										<img src="src/img/ring.svg" width="32px">
-									</button>
-								</li>
-								<li class="nav-item" role="presentation">
-									<button class="nav-link" id="contact-tab" data-bs-toggle="tab" data-bs-target="#contact" type="button" role="tab" aria-controls="contact" aria-selected="false">
-										<img src="src/img/leather-boot.svg" width="32px">
-									</button>
-								</li>
-							</ul>
-
-							<div class="tab-content" id="myTabContent">
-								<div class="tab-pane fade show active" style="display: flex; margin: 5px" role="tabpanel" aria-labelledby="home-tab">
-									<button class="btn btn-outline-secondary"><i class="fa fa-arrow-left"></i></button>
-									<div style="flex-grow: 1; display: flex; flex-direction: column; align-items: center;">
-										<div style="margin-bottom: 5px;">
-											<img id="inventory-0" width="32px" height="32px" />
-											<img id="inventory-1" width="32px" height="32px" />
-											<img id="inventory-2" width="32px" height="32px" />
-											<img id="inventory-3" width="32px" height="32px" />
-											<img id="inventory-4" width="32px" height="32px" />
-										</div>
-
-										<div>
-											<img id="inventory-5" width="32px" height="32px" />
-											<img id="inventory-6" width="32px" height="32px" />
-											<img id="inventory-7" width="32px" height="32px" />
-											<img id="inventory-8" width="32px" height="32px" />
-											<img id="inventory-9" width="32px" height="32px" />
-										</div>
-									</div>
-									<button class="btn btn-outline-secondary"><i class="fa fa-arrow-right"></i></button>
-								</div>
-							</div>
-						</div>
-					</div>
-				</div>
+				
 			</div>
 		</div>
 
@@ -209,7 +260,7 @@
 		</div>
 
 		<!-- Unlocks -->
-		<div style="position: absolute; bottom: 5px; right: 5px; width: 300px">
+		<div style="position: absolute; bottom: 5px; right: 5px; width: 300px" hidden>
 			<div class="accordion" id="unlocks">
 				<div class="accordion-item">
 					<h2 class="accordion-header">
@@ -233,7 +284,7 @@
 		<button class="btn btn-outline-secondary" style="position: absolute; bottom: 5px; left: 5px" onclick="save()">Manual Save</button>
 
 		<!-- Toasts -->
-		<div id="toast-container" class="toast-container" style="position: absolute; bottom: 5px; left: 5px"></div>
+		<div id="toast-container" class="toast-container" style="position: absolute; bottom: 5px; left: 5px; background-color: #919098; color: black"></div>
 
 		<!-- Modals -->
 
@@ -252,6 +303,16 @@
 			</div>
 		</div>
 
+		<div class="modal fade" id="imageModal" tabindex="-1" aria-labelledby="imageModal" aria-hidden="true">
+			<div class="modal-dialog"  style="max-width: fit-content;">
+				<div class="modal-content" style="background-color: #919098;">
+					<div class="modal-body">
+						<img src="src/img/monsters/Boss Abomination Red.png" style="transform: scaleX(-1);"/>
+					</div>
+				</div>
+			</div>
+		</div>
+
 
 		<!-- Data files -->
 
@@ -263,8 +324,11 @@
 		
 		<script src="src/events.js"></script>
 		<script src="src/components/core.js"></script>
+		<script src="src/components/menu.js"></script>
+		<script src="src/components/logs.js"></script>
 		<script src="src/components/fight.js"></script>
 		<script src="src/components/storyline.js"></script>
 		<script src="src/components/items.js"></script>
+		<script src="src/components/final.js"></script>
 	</body>
 </html>

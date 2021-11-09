@@ -12,13 +12,14 @@ const player = {
 		min: 1,
 		max: 1
 	},
-	speed: 0.2,
+	speed: 2.0,
 	level: 1,
 	exp: 0
 };
 
 let enemy = {
-	hp: 10,
+	hp: 2,
+	maxHp: 2,
 	def: 0,
 	attack: {
 		min: 1,
@@ -54,27 +55,41 @@ function fight() {
 	const bar = getElement('player-attack-bar');
 	const ebar = getElement('enemy-attack-bar');
 
+	console.log(player, enemy);
+	addLog('----Combat begins----');
+
 	finished = false;
 	
 	const playerAttack = () => loop(bar, 0, (player.speed * 1000)/100, () => {
-		enemy.hp = Math.max(enemy.hp - calculateDamage(player, enemy), 0);
+		const damage = calculateDamage(player, enemy);
+		enemy.hp = Math.max(enemy.hp - damage, 0);
 		update();
+		addLog(`You strike out at your foe dealing a ${damageName(damage, enemy.maxHp)} blow.`, true);
+
+		if (enemy.hp <= enemy.maxHp/2 && !enemy.bloodied) {
+			addLog('Your last hit left the enemy in a bloodied state.', true);
+			enemy.bloodied = true;
+		}
 
 		if (enemy.hp <= 0) {
-			player.exp += 1;
-			getElement('player-info-exp').innerText = player.exp;
-			publish(FIGHT_EVENTS.FIGHT_WON);
-			return fightFinished();
+			// player.exp += 1;
+			// getElement('player-info-exp').innerText = player.exp;
+			addLog("They won't be getting up from that hit.", true);
+			fightFinished();
+			return wait(1000, () => publish(FIGHT_EVENTS.FIGHT_WON));
 		}
 
 		playerAttack();
 	});
 
 	const enemyAttack = () => loop(ebar, 0, (enemy.speed * 1000)/100, () => {
-		player.hp = Math.max(player.hp - calculateDamage(enemy, player), 0);
+		const damage = calculateDamage(enemy, player);
+		player.hp = Math.max(player.hp - damage, 0);
 		update();
+		addLog(`The ${"MONSTER NAME"} hits you doing a ${damageName(damage, player.maxHp)} blow.`, true)
 
 		if (player.hp <= 0) {
+			addLog('No longer able to fight you run away and search for respite.', true);
 			return fightFinished();
 		}
 
@@ -92,8 +107,8 @@ function loop(bar, progress, interval, onFinish) {
 		return;
 	}
 
-	bar.style=`width: ${progress}%`;
-	bar.setAttribute('aria-valuenow', progress + '');
+	// bar.style=`width: ${progress}%`;
+	// bar.setAttribute('aria-valuenow', progress + '');
 
 	if (progress + 1 > 100) {
 		return onFinish();
@@ -118,42 +133,53 @@ function fightFinished() {
 		getElement('fight-button').removeAttribute('disabled');
 	}
 
-	getElement('enemy-attack-bar').style=`width: 0`;
-	getElement('enemy-attack-bar').setAttribute('aria-valuenow', '0');
+	addLog('----Combat ends----');
+
+	// getElement('enemy-attack-bar').style=`width: 0`;
+	// getElement('enemy-attack-bar').setAttribute('aria-valuenow', '0');
 	
-	getElement('player-attack-bar').style=`width: 0`;
-	getElement('player-attack-bar').setAttribute('aria-valuenow', '0');
+	// getElement('player-attack-bar').style=`width: 0`;
+	// getElement('player-attack-bar').setAttribute('aria-valuenow', '0');
 	
 	enemy = generateEnemy(monsterLevel);
 	update();
 }
 
+function damageName(damage, hp) {
+	if (damage/hp < 0.25) return choose(['minor', 'minuscule', 'weak']);
+	if (damage/hp < 0.5) return choose(['strong', 'powerful', 'solid']);
+	return choose(['devastating', 'destructive', 'catastrophic']);
+}
+
 function update() {
-	getElement('enemy-hp').innerText = enemy.hp;
-	getElement('player-hp').innerText = player.hp;
+	// getElement('enemy-hp').innerText = enemy.hp;
+	// getElement('player-hp').innerText = player.hp;
 
-	getElement('player-dps').innerText = ((player.attack.max + player.attack.min)/2 / player.speed).toFixed(2);
-	getElement('enemy-dps').innerText = ((enemy.attack.max + enemy.attack.min)/2 / enemy.speed).toFixed(2);
+	// getElement('player-dps').innerText = ((player.attack.max + player.attack.min)/2 / player.speed).toFixed(2);
+	// getElement('enemy-dps').innerText = ((enemy.attack.max + enemy.attack.min)/2 / enemy.speed).toFixed(2);
 
-	getElement('player-speed').innerText = (1/player.speed).toFixed(2);
-	getElement('enemy-speed').innerText = (1/enemy.speed).toFixed(2);
+	// getElement('player-speed').innerText = (1/player.speed).toFixed(2);
+	// getElement('enemy-speed').innerText = (1/enemy.speed).toFixed(2);
 
-	getElement('player-def').innerText = player.def;
-	getElement('enemy-def').innerText = enemy.def;
+	// getElement('player-def').innerText = player.def;
+	// getElement('enemy-def').innerText = enemy.def;
 
-	getElement('player-atk').innerText = `${player.attack.min} - ${player.attack.max}`;
-	getElement('enemy-atk').innerText = `${enemy.attack.min} - ${enemy.attack.max}`;
+	// getElement('player-atk').innerText = `${player.attack.min} - ${player.attack.max}`;
+	// getElement('enemy-atk').innerText = `${enemy.attack.min} - ${enemy.attack.max}`;
 }
 
 function generateEnemy(level) {
+	const hp = 2 + Math.round(Math.pow(level, 1.5));
 	return {
-		hp: 10 + Math.round(Math.pow(level, 1.5)),
+		hp,
+		maxHp: hp,
 		def: 0,
 		attack: {
 			min: Math.round(Math.pow(level, 1.3)),
 			max: Math.round(Math.pow(level, 1.3)) + Math.round(Math.pow(level, 1.5))
 		},
-		speed: 1.0
+		speed: 3.0,
+		bloodied: false
 	}
 }
 
@@ -180,12 +206,15 @@ function rest() {
 	finished = false;
 
 	getElement('respawn').hidden = false;
+	addLog('You take a moment to rest up, regaining your composure and patching your wounds.');
 
 	loop(getElement('respawn-bar'), 0, 2000/100, () => {
 		finished = true;
 		player.hp = player.maxHp;
 
 		update();
+
+		addLog('Fully recovered you are ready to set out again.');
 
 		getElement('respawn').hidden = true;
 		getElement('respawn-bar').setAttribute('aria-valuenow', '0');

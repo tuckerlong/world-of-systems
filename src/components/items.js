@@ -128,12 +128,14 @@ function itemTooltipDisplay(event, item, equipped) {
 	itemTooltipUpdate(item);
 
 	const r = event.target.getBoundingClientRect();
-	const ele = getElement('item-tooltip');
+	const tooltip = getElement('item-tooltip');
 
-	ele.style.top = `${r.top - 5}px`;
-	ele.style.left = `${r.left + r.width/2}px`;
-	ele.style.transform = 'translateY(-100%) translateX(-50%)';
-	ele.hidden = false;
+	tooltip.style.top = `${r.top}px`;
+	tooltip.style.left = `${r.left - 5}px`;
+	tooltip.style.transform = `translateX(-100%)`;
+	tooltip.hidden = false;
+	
+	console.log(tooltip.getBoundingClientRect(), r);
 }
 
 function itemTooltipUpdate(item) {

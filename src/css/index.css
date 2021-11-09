@@ -1,8 +1,10 @@
 .fighter-info {
 	position: relative;
-	width: 150px;
-	border: 1px solid black;
-	padding: 5px;
+	/* width: 150px; */
+	/* border: 1px solid black; */
+	/* padding: 5px; */
+	/* display: flex;
+	align-items: flex-end; */
 }
 
 .inventory-section {
@@ -14,6 +16,71 @@
 .inventory-section div {
 	text-decoration: underline;
 }
+
+.absolute-center {
+	position: absolute;
+	left: 50%;
+	transform: translateX(-50%);
+}
+
+#logs {
+	width: 500px; 
+	height: 300px; 
+	border: 1px solid black;
+	padding: 5px; 
+	overflow: auto;
+	margin-bottom: 5px;
+}
+
+#section-logs {
+	position: relative;
+	transition: 0.3s;
+	margin-right: 0;
+	width: 150px;
+}
+
+.logs-collapsed {
+	margin-right: -155px !important; 
+}
+
+.logs-collapsed h3 {
+	transform: unset;
+}
+
+#menu {
+	position: relative;
+	margin-left: 0;
+	width: 300px;
+	transition: 0.3s;
+}
+
+#menu.collapsed {
+	margin-left: -305px;
+}
+
+#menu.collapsed > button {
+	left: 0px;
+}
+
+#menu-right {
+	position: absolute;
+	margin-right: 0;
+	/* transition-delay: 1s; */
+	transition: 0.3s;
+	right: 5px;
+}
+
+#menu-right.collapsed-menu-right-inventory {
+	margin-right: -305px;
+}
+
+/* [data-toggle="collapse"] .fa:before {   
+  content: "\f139";
+}
+
+[data-toggle="collapse"].collapsed .fa:before {
+  content: "\f13a";
+} */
 
 .menu-button {
 	margin-bottom: 5px;
@@ -34,4 +101,44 @@
 	/* -ms-transition: none; */
 	-o-transition: none;
 	transition: none;
+}
+
+.logs > div {
+	transition: 0.3s;
+}
+
+.fade-in {
+  animation: fadeIn 5s;
+  -webkit-animation: fadeIn 5s;
+  -moz-animation: fadeIn 5s;
+  -o-animation: fadeIn 5s;
+  -ms-animation: fadeIn 5s;
+}
+@keyframes fadeIn {
+  0% {opacity:0;}
+  100% {opacity:1;}
+}
+
+@-moz-keyframes fadeIn {
+  0% {opacity:0;}
+  100% {opacity:1;}
+}
+
+@-webkit-keyframes fadeIn {
+  0% {opacity:0;}
+  100% {opacity:1;}
+}
+
+@-o-keyframes fadeIn {
+  0% {opacity:0;}
+  100% {opacity:1;}
+}
+
+@-ms-keyframes fadeIn {
+  0% {opacity:0;}
+  100% {opacity:1;}
+}
+
+::-webkit-scrollbar {
+	display: none;
 }
