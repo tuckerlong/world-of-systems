@@ -89,3 +89,14 @@ function roll() {
 	const images = ['Boss Abomination Red.png', 'Forest Tree.png', 'Goblin Grunt.png', 'Boss Darkness Titan Ilnoct.png']
 	getElement('monster-image').src = `src/img/monsters/${images[range(0, images.length - 1)]}`;
 }
+
+
+function loadSection(path, id, cb) {
+	fetch(path)
+		.then(res => res.text())
+		.then(html => {
+			const parser = new DOMParser();
+			const doc = parser.parseFromString(html, 'text/html').querySelector('body').firstChild;
+			getElement(id).appendChild(doc);
+		}).then(_ => cb ? cb() : null);
+}
